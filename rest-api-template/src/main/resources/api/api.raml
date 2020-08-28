@@ -1,0 +1,29 @@
+#%RAML 1.0
+version: v1
+title: HelloWorld
+
+/hello:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "message": "Hello World!"
+              }
+/bye:
+  get:
+    queryParameters:
+      name: 
+        type: string
+        default: Sam
+        required: false
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "message": "Good Bye Sam!"
+              }

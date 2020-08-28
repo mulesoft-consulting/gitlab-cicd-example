@@ -1,0 +1,19 @@
+image: maven:3.3.9-jdk-8
+
+#Default Variables
+variables:
+  MAVEN_CLI_OPTS: "-B -s ci-settings.xml"
+
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+
+stages:
+  - build
+
+build:
+  stage: build
+  script:
+    - echo "Building API Parent POM and deploying application"
+    - mvn $MAVEN_CLI_OPTS clean package deploy

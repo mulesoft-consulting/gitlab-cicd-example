@@ -1,0 +1,197 @@
+image: maven:3.3.9-jdk-8
+
+#Default Variables
+variables:
+  MAVEN_CLI_OPTS: "-B -s ci-settings.xml"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  MAVEN_DEPLOY_PROPS: "-Dapi.id=$API_ID -Dmule.key=$MULE_KEY -DCH_ENV=$CH_ENV -DCONNECTED_APP_CLIENT_ID=$CONNECTED_APP_CLIENT_ID -DCONNECTED_APP_CLIENT_SECRET=$CONNECTED_APP_CLIENT_SECRET -DCH_RGN=$CH_RGN -DCH_WORKERTYPE=$CH_WORKER_TYPE -DCH_WORKERS=$CH_WORKERS -DCH_CLIENT_ID=$CH_CLIENT_ID -DCH_CLIENT_SECRET=$CH_CLIENT_SECRET -DCH_ORG=$CH_ORGID -DBUILD_NAME=$APP_NAME -DCH_BGID=$CH_BGID -DCH_BG_NAME=$CH_BG_NAME"
+
+  # Cloudhub environment identifiers. This is currently based on the Travel and Information Services Business Group.
+  CH_ENV_DEV: "DEV"
+  CH_ENV_TEST: "TEST"
+  CH_ENV_UAT: "UAT"
+  CH_ENV_PROD: "PROD"
+  CH_RGN: "eu-west-1"
+
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+    - deployArtifacts/
+
+stages:
+  - build
+  - deploy-snapshot
+  - create-release
+  - get-release-artifacts
+  - deploy-release
+  - deploy-prod
+
+
+build-develop:
+  stage: build
+  script:
+    - echo "Building Mule application, and Executing Unit Tests"
+    - mvn $MAVEN_CLI_OPTS clean package test -Dmule.key=${MULE_KEY}
+  environment:
+    name: DEV
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+  only:
+    - develop
+    - /^feature-.*$/
+
+
+build-release:
+  stage: build
+  script:
+    - echo "Building Mule application, and Executing Unit Tests"
+    - mvn $MAVEN_CLI_OPTS clean package test deploy -Dmule.key=${MULE_KEY}
+  environment:
+    name: DEV
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+  only:
+      - /^release-.*$/
+
+deploy-snapshot-dev:
+  stage: deploy-snapshot
+  variables:
+    APP_NAME: "${APP_NAME_PREFIX}-${CI_PROJECT_NAME}-${APP_VERSION}-dev"
+    # These variables are business group specific - These are controlled within the parent GitLab Group.
+    CH_CLIENT_ID: $CH_DEV_CLIENT_ID
+    CH_CLIENT_SECRET: $CH_DEV_CLIENT_SECRET
+    CH_BGID: $CH_BG_ID
+    CH_BG_NAME: $CH_BG_NAME
+    CH_ENV: ${CH_ENV_DEV}
+  environment:
+    name: DEV
+  only:
+    - develop
+    - /^release-.*$/
+  script:
+    - echo "Deploying the project with maven to $CH_ENV_DEV environment"
+    - mvn $MAVEN_CLI_OPTS deploy -P cloudhub -DmuleDeploy -DskipTests -Dmule.env=dev -Dcloudhub.skipDeploymentVerification=true $MAVEN_DEPLOY_PROPS
+
+deploy-snapshot-test:
+  stage: deploy-snapshot
+  variables:
+    APP_NAME: "${APP_NAME_PREFIX}-${CI_PROJECT_NAME}-${APP_VERSION}-test"
+    # These variables are business group specific - These are controlled within the parent GitLab Group.
+    CH_CLIENT_ID: $CH_TEST_CLIENT_ID
+    CH_CLIENT_SECRET: $CH_TEST_CLIENT_SECRET
+    CH_ENV: ${CH_ENV_TEST}
+    CH_BGID: $CH_BG_ID
+    CH_BG_NAME: $CH_BG_NAME
+  environment:
+    name: TEST
+  # The stage has been agreed to be manual to reduce impact on the Testing Teams.
+  when: manual
+  only:
+    - develop
+    - /^release-.*$/
+  script:
+    - echo "Deploying the project with maven to TEST environment"
+    - mvn $MAVEN_CLI_OPTS deploy -P cloudhub -DmuleDeploy -DskipTests -Dmule.env=test -Dcloudhub.skipDeploymentVerification=true $MAVEN_DEPLOY_PROPS
+
+
+release:
+  stage: create-release
+  when: manual
+  only:
+      - develop
+  before_script:
+    # Allow push/merge/commit action on git action(s)
+    # https://forum.gitlab.com/t/getting-mvn-release-to-work-with-gitlab-ci/4904/2
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$GITLAB_SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - echo "$GITLAB_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - git config --global user.email "gitlab-mule@raildeliverygroup.co.uk"
+    - git config --global user.name "Auto Gitlab Pipeline"
+    - git remote set-url --push origin "${CI_REPOSITORY_URL}"
+  script:
+    # The following script is specific to performing the Maven Release - including updating release and development versions, as well as creating the release branch as per GitFlow model.
+    - git checkout -B "$CI_COMMIT_REF_NAME"
+    - mvn $MAVEN_CLI_OPTS release:prepare release:perform release:clean -DscmCommentPrefix="Auto-Release [skip ci]" -DreleaseVersion=$RELEASE_VERSION -DdevelopmentVersion=$NEXT_DEV_VERSION -Darguments="-Dmule.skip.deploy=true -Dmaven.test.skip=true -DskipTests"
+    # We are unable to auto create the branch using GIT here due to issues with permissions on the CI deploy keys so have opted for the API route.
+    - curl --request POST --header "Private-Token:${GITLAB_PRIVATE_TOKEN}" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/branches -d branch=release-$RELEASE_VERSION -d ref=rc$RELEASE_VERSION
+
+get-release-artifacts:
+  stage: get-release-artifacts
+  script:
+    - echo "Building Mule application, and Executing Unit Tests"
+    - mkdir -p deployArtifacts
+    - mvn $MAVEN_CLI_OPTS dependency:get -Dartifact=uk.co.nationalrail.travelinfoservices:${CI_PROJECT_NAME}:${DEPLOY_VERSION}:jar:mule-application -DremoteRepositories=gitlab-maven::default::https://gitlab.com/api/v4/groups/rail-delivery-group-mulesoft/-/packages/maven -Ddest=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dtransitive=false
+  only:
+    - tags
+
+deploy-release-test:
+  stage: deploy-release
+  script:
+    - echo "Deploy to TEST Env"
+  variables:
+    APP_NAME: "${APP_NAME_PREFIX}-${CI_PROJECT_NAME}-${APP_VERSION}-test"
+    CH_CLIENT_ID: $CH_TEST_CLIENT_ID
+    CH_CLIENT_SECRET: $CH_TEST_CLIENT_SECRET
+    CH_ENV: ${CH_ENV_TEST}
+    CH_BGID: $CH_BG_ID
+    CH_BG_NAME: $CH_BG_NAME
+  environment:
+    name: TEST
+  when: manual
+  only:
+    - tags
+  script:
+    - echo "Deploying the project with maven to TEST environment"
+    - mvn $MAVEN_CLI_OPTS deploy -P cloudhub -DmuleDeploy -DskipTests -Dmule.env=test $MAVEN_DEPLOY_PROPS -Dcloudhub.skipDeploymentVerification=true -Dmule.deploy.artifact=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dmaven.install.skip=true
+
+
+deploy-release-uat:
+  stage: deploy-release
+  script:
+    - echo "Deploy to UAT Env"
+  variables:
+    APP_NAME: "${APP_NAME_PREFIX}-${CI_PROJECT_NAME}-${APP_VERSION}-uat"
+    CH_CLIENT_ID: $CH_UAT_CLIENT_ID
+    CH_CLIENT_SECRET: $CH_UAT_CLIENT_SECRET
+    CH_ENV: ${CH_ENV_UAT}
+    CH_BGID: $CH_BG_ID
+    CH_BG_NAME: $CH_BG_NAME
+  environment:
+    name: UAT
+  when: manual
+  only:
+    - tags
+    # Uncomment on exception only. UAT should always be built from a release branch.
+    # - develop
+  script:
+    - echo "Deploying the project with maven to UAT environment"
+    - mvn $MAVEN_CLI_OPTS deploy -P cloudhub -DmuleDeploy -DskipTests -Dmule.env=uat $MAVEN_DEPLOY_PROPS -Dcloudhub.skipDeploymentVerification=true -Dmule.deploy.artifact=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dcloudhub.monitoringEnabled=true -Dmaven.install.skip=true
+
+deploy-prod:
+  stage: deploy-prod
+  variables:
+    APP_NAME: "${APP_NAME_PREFIX}-${CI_PROJECT_NAME}-${APP_VERSION}"
+    CH_CLIENT_ID: $CH_PROD_CLIENT_ID
+    CH_CLIENT_SECRET: $CH_PROD_CLIENT_SECRET
+    CH_ENV: ${CH_ENV_PROD}
+    CH_BGID: $CH_BG_ID
+    CH_BG_NAME: $CH_BG_NAME
+  environment:
+    name: PROD
+  when: manual
+  only:
+    - tags
+  script:
+    - echo "Deploying the project with maven to production environment"
+    - mvn $MAVEN_CLI_OPTS deploy -P cloudhub -DmuleDeploy -DskipTests -Dmule.env=prod $MAVEN_DEPLOY_PROPS -Dmule.deploy.artifact=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dcloudhub.monitoringEnabled=true -Dmaven.install.skip=true
+  artifacts:
+    paths:
+    - deployArtifacts/*.jar

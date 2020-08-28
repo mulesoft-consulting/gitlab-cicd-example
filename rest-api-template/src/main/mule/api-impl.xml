@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:error-handler-plugin="http://www.mulesoft.org/schema/mule/error-handler-plugin"
+	xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/error-handler-plugin http://www.mulesoft.org/schema/mule/error-handler-plugin/current/mule-error-handler-plugin.xsd">
+
+	<flow name="get:\bye:api-config">
+		<json-logger:logger doc:name="Logger" doc:id="50215dcd-142d-4baa-8438-a5035168be90" config-ref="JSON_Logger_Config" tracePoint="BEFORE_REQUEST" message="Before request"/>
+		<ee:transform
+			xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+			xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Good Bye!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:name="Logger" doc:id="7401207c-6ee5-4b1f-bf41-5afede91eefb" config-ref="JSON_Logger_Config" tracePoint="AFTER_TRANSFORM" message="After transform"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d8383101-0505-4aa7-afaa-d32bdf581f23" >
+				<json-logger:logger doc:name="Logger" doc:id="11586a80-2f55-4d6a-acfa-1c088878759a" priority="ERROR" tracePoint="EXCEPTION" message="Error Occured"/>
+				<error-handler-plugin:on-error doc:name="Process Error" doc:id="a88f2edd-6b79-497a-8f1b-63595a122dee" />
+				<set-variable value="#[attributes.httpStatus]" doc:name="Set Variable" doc:id="ba00774a-4d39-481a-beb6-c3a6b0fffe9c" variableName="httpStatus"/>
+				<json-logger:logger doc:name="Logger" doc:id="3a239f31-4fc7-4785-8471-ca0615357bb1" priority="ERROR" tracePoint="END" message="Finished with Error"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="get:\hello:api-config">
+		<ee:transform
+			xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+			xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Hello World!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="globalError_Handler" />
+	</flow>
+
+</mule>
