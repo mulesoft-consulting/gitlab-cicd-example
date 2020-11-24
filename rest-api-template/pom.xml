@@ -1,73 +1,63 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-
-	<parent>
-		<groupId>uk.co.company</groupId>
-		<artifactId>api-parent-pom</artifactId>
-		<version>1.0.0</version>
-	</parent>
-
-	<groupId>uk.co.company</groupId>
-	<artifactId>rest-api-template</artifactId>
-	<!-- Update Version as required -->
-	<version>1.0.0-SNAPSHOT</version>
-	<packaging>mule-application</packaging>
-
-	<name>rest-api-template</name>
-
-	<description>REST API Template for experience, process, and System APIs</description>
-
-	<properties>
-        <!-- Add the relevant API layer. One of (api.layer.) papi, eapi, sapi, batch, none. -->
-        <api.layer>${api.layer.none}</api.layer>
-        <cloudhub.monitoringEnabled>false</cloudhub.monitoringEnabled>
-    	<app.runtime>4.3.0</app.runtime>
-    </properties>
-
-	<build>
-		<resources>
-			<resource>
-				<directory>${basedir}/src/main/app</directory>
-				<filtering>true</filtering>
-			</resource>
-			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.mule.tools.maven</groupId>
-				<artifactId>mule-maven-plugin</artifactId>
-            <configuration>
-                    <classifier>mule-application</classifier>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.mulesoft.munit.tools</groupId>
-                <artifactId>munit-maven-plugin</artifactId>
-            </plugin>
-			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-release-plugin</artifactId>
-     		</plugin>
-		</plugins>
-	</build>
-
-    <repositories>
-		<repository>
-			<id>gitlab-maven-proxy</id>
-			<name>GitLab Maven Repository</name>
-			<url>https://dev.api.company.co.uk/gitlab-api-proxy/api/v4/groups/rail-delivery-group-mulesoft/-/packages/maven</url>
-			<layout>default</layout>
-		</repository>
-	</repositories>
-
-	<scm>
-    	<!-- developerConnection>scm:git:git@gitlab.com:rail-delivery-group-mulesoft/mule-project-templates/mule-deploy-poc.git</developerConnection-->
-		<developerConnection>scm:git:git@gitlab.com:${env.CI_PROJECT_PATH}.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>uk.co.company</groupId>
+    <artifactId>api-parent-pom</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <groupId>uk.co.company</groupId>
+  <artifactId>rest-api-template</artifactId>
+  <!-- Update Version as required -->
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>mule-application</packaging>
+  <name>rest-api-template</name>
+  <description>Generic REST API Template for Experience, Process, and System APIs</description>
+  <properties>
+    <!-- Add the relevant API layer. One of (api.layer.) papi, eapi, sapi, batch, none. -->
+    <api.layer>${api.layer.none}</api.layer>
+    <cloudhub.monitoringEnabled>false</cloudhub.monitoringEnabled>
+    <app.runtime>4.3.0</app.runtime>
+  </properties>
+  <build>
+    <resources>
+      <resource>
+        <directory>${basedir}/src/main/app</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.mule.tools.maven</groupId>
+        <artifactId>mule-maven-plugin</artifactId>
+        <configuration>
+          <classifier>mule-application</classifier>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mulesoft.munit.tools</groupId>
+        <artifactId>munit-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  <repositories>
+    <repository>
+      <id>gitlab-maven-proxy</id>
+      <name>GitLab Maven Repository</name>
+      <url>https://dev.api.company.co.uk/gitlab-api-proxy/api/v4/groups/rail-delivery-group-mulesoft/-/packages/maven</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+  <scm>
+    <developerConnection>scm:git:git@gitlab.com:${env.CI_PROJECT_PATH}.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 </project>

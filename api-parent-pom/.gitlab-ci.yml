@@ -15,5 +15,5 @@ stages:
 build:
   stage: build
   script:
-    - echo "Building API Parent POM and deploying application"
+    - echo "Building API Parent POM, and deploying application"
     - mvn $MAVEN_CLI_OPTS clean package deploy
