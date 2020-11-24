@@ -1,7 +1,7 @@
 include:
-  - project: 'rail-delivery-group-mulesoft/mule-project-templates/cicd-base'
+  - project: 'parent/mule-project-templates/cicd-base'
     ref: master
-    file: '/travel-info-services/.gitlab-ci.yml'
+    file: '/biz-group/.gitlab-ci.yml'
 
 #Default Variables
 variables:
