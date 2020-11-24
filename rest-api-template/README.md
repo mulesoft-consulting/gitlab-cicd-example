@@ -112,7 +112,7 @@ git push -u origin feature-{JIRA-number}
 
 ```
 	<parent>
-		<groupId>uk.co.rdg</groupId>
+		<groupId>uk.co.example</groupId>
 		<artifactId>api-parent-pom</artifactId>
 		<version>${parent.pom.version}</version>
 	</parent>
