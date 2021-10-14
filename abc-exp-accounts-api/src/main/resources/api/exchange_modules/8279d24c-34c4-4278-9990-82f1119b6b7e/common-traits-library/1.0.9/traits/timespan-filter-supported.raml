@@ -1,0 +1,18 @@
+#%RAML 1.0 Trait
+
+usage: Use this filter when you need to apply a timespan filter to a GET query
+queryParameters:
+  beginDate:
+    description: |
+      <<descriptionBeginDate>>
+      (full-date - RFC 3339)
+    type: date-only
+    required: true
+    example: 2016-05-19
+  endDate:
+    description: |
+      <<descriptionEndDate>>
+      (full-date - RFC 3339)
+    type: date-only
+    required: true
+    example: 2016-05-22

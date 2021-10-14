@@ -1,0 +1,16 @@
+#%RAML 1.0 Trait
+
+usage: |
+      Use this traits to use orderBy query parameters.
+
+queryParameters:
+  orderBy:
+    type: string
+    description: The field based on which consumer wants the data set to be order by.
+    example: "id"
+    required: false
+  isAscending:
+    type: string
+    description: Which direction the order would be - for example, small to large or large to small
+    example: "true"
+    required: false

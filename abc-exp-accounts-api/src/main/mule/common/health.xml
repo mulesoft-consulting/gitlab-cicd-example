@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	
+	<sub-flow name="ping_get-health"
+		doc:id="a54e7d6d-60c9-4d58-9a42-40855e767c6a">
+		<set-variable
+			value='#[attributes.queryParams.checkDependencies == "true" default false]'
+			doc:name="checkDependencies"
+			doc:id="bffeb0c6-510d-4e08-a4e0-1269803604ec"
+			variableName="checkDependencies" />
+		<set-variable value="false" doc:name="INIT hasDownDependencies" doc:id="6b4c892d-21d0-40f5-90af-cd790238f8e6" variableName="hasDownDependencies"/>
+		<choice doc:name="Choice for check dependencies"
+			doc:id="245af207-4b50-47d8-ac4d-87e6f48301fc">
+			<when expression="#[vars.checkDependencies]">
+				<flow-ref doc:name="ping_check-dependencies"
+					doc:id="ba480201-c8d2-4ce9-8729-6e106320e45d"
+					name="ping_check-dependencies"/>
+			</when>
+			<otherwise>
+				<set-variable doc:name="dependencyList"
+					doc:id="67da54ed-1bf9-40f6-bbe6-41162a3e37f6"
+					variableName="dependencyList" value="#[null]" />
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Map Response"
+			doc:id="38321d86-8900-4b73-8db9-bb47908f4faf">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+	status: if (vars.hasDownDependencies) "DOWN" else "UP",
+	apiName: p("logger.project.name") default "",
+	apiVersion: p("logger.project.version") default "",
+	dependencies: vars.dependencyList
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[if (vars.hasDownDependencies) 400 else 200]" doc:name="httpStatus"
+			doc:id="d1a76d34-db2f-4094-8e05-0100b67eb042"
+			variableName="httpStatus" />
+	</sub-flow>
+	<sub-flow name="ping_check-dependencies"
+		doc:id="b78391ad-a9b4-4055-94c0-29aaf6d40f25">
+		<ee:transform doc:name="Consolodate Responses" doc:id="39928aa3-9268-43fd-80a6-8798dd9193b9">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[
+	{
+		status: "UP",
+		apiName: "example-api",
+		apiVersion: "v1"
+	}
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Map Dependencies" doc:id="d0356222-434f-47d6-bb9f-ef7f1436a47d">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="dependencyList"><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="hasDownDependencies"><![CDATA[%dw 2.0
+output application/java
+---
+payload.*status contains "DOWN" default false]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

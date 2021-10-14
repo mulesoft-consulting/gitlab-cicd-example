@@ -1,0 +1,14 @@
+#%RAML 1.0 Library
+usage: Common traits to be applied
+
+traits:
+  client-id-required: !include traits/client-id-required.raml
+  pageable: !include traits/pageable.raml
+  sortable: !include traits/sortable.raml
+  countable: !include traits/countable.raml
+  orderBy: !include traits/orderBy.raml
+  time-period: !include traits/time-period.raml
+  timespan-filter-supported: !include traits/timespan-filter-supported.raml
+  traceable: !include traits/traceable.raml
+  commonErrorHandler: !include traits/errorHandling.raml
+  healthCheck: !include traits/healthCheck.raml

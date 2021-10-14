@@ -1,0 +1,8 @@
+api:
+  id:           "12345678"
+  port:         "8091"
+  
+tls.keystore:
+  type:         ""
+  path:         ""
+  alias:        ""

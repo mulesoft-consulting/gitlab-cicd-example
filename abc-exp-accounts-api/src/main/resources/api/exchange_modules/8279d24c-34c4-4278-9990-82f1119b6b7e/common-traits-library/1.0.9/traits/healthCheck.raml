@@ -1,0 +1,60 @@
+#%RAML 1.0 Trait
+usage: Apply this trait to any API that needs to implement Health Checks
+description: Any health check within the API would result in the the following responses being generated.
+
+uses: 
+  commonTypes: healthCheckLibrary.raml
+
+queryParameters:
+    checkDependencies: 
+      type: boolean
+      description: Check downstream dependencies as part of the health check, Default is FALSE
+      default: false  
+
+responses:         
+  200: 
+    description: Health Check Succeeded
+    body:
+      application/json:
+        type: commonTypes.health-check
+        example:
+          {
+            "status": "UP",
+            "apiName": "exp-hello-world-api",
+            "apiVersion": "v1",
+            "dependencies": [
+              {
+                "status": "UP",
+                "apiName": "sys-hello-api",
+                "apiVersion": "v1",
+              },
+              {
+                "status": "UP",
+                "apiName": "sys-world-api",
+                "apiVersion": "v1",
+              }
+            ]
+          }
+  400:
+    description: Health Check Failed or Partially Failed
+    body:
+      application/json:
+        type: commonTypes.health-check
+        example:
+          {
+            "status": "DOWN",
+            "apiName": "exp-hello-world-api",
+            "apiVersion": "v1",
+            "dependencies": [
+              {
+                "status": "OK",
+                "apiName": "sys-hello-api",
+                "apiVersion": "v1",
+              },
+              {
+                "status": "DOWN",
+                "apiName": "sys-world-api",
+                "apiVersion": "v1",
+              }
+            ]
+          }

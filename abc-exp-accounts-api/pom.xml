@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.example</groupId>
+		<artifactId>api-parent-pom</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
+	<!-- TODO: Replace this with com.{mycompany} -->
+	<groupId>com.example</groupId>
+	<!-- TODO: Replace artifact id with project name -->
+	<artifactId>abc-exp-accounts-api</artifactId>
+	<!-- TODO: Update API version -->
+	<version>1.0.0</version>
+	<packaging>mule-application</packaging>
+
+	<!-- TODO: Ensure this matches with project name and description-->
+	<name>abc-exp-accounts-api</name>
+	<description>REST API Template for experience, process, and System APIs</description>
+	<properties>
+		<!-- TODO: Update this to appropriate layer (eapi/papi/sapi) -->
+		<api.layer>${api.layer.eapi}</api.layer>
+		<!-- TODO: Ensure correct runtime version -->
+	</properties>
+	<build>
+		<resources>
+			<resource>
+				<directory>${basedir}/src/main/app</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+        <groupId>org.mule.tools.maven</groupId>
+        <artifactId>mule-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.mulesoft.munit.tools</groupId>
+				<artifactId>munit-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<!-- TODO: Remove this dependency for rest-api-template-->
+	</dependencies>
+	<!-- TODO: Remove this repository and replace with artifact repository where Parent-POM files are published-->
+	<repositories>
+		<repository>
+			<id>gitlab-maven</id>
+			<url>https://gitlab.com/api/v4/groups/mule-gitlab-demo/-/packages/maven</url>
+		</repository>
+	</repositories>
+
+	<scm>
+		<developerConnection>scm:git:git@gitlab.com:${env.CI_PROJECT_PATH}.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+</project>

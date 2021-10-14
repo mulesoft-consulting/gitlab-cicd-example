@@ -1,0 +1,36 @@
+#%RAML 1.0 Library
+
+types: 
+  health-check-dependency:
+    description: This is generic health check dependency data model
+    type: object
+    properties: 
+      status:
+        type: string
+        example: "UP"
+      apiName: 
+        type: string
+        example: "bkt-sys-hello-api"
+      apiVersion:
+        type: string
+        example: "v1"
+      dependencies:
+        type: health-check-dependency[]
+        required: false
+  health-check: 
+    description: This is generic health check reponse model
+    type: object
+    properties:
+      status: 
+        type: string
+        example: "UP"
+      apiName:
+        type: string
+        example: "bkt-exp-hello-world-api"
+      apiVersion:
+        type: string
+        example: "v1"
+      dependencies:
+        type: health-check-dependency[]
+        required: false
+

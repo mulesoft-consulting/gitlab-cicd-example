@@ -1,0 +1,16 @@
+#%RAML 1.0 DataType
+type: object
+properties: 
+  id: string | integer
+  name: string
+  phone: string
+  email?: string
+  createdDate:
+    type: datetime
+    example: 2016-03-24T14:00:00.000Z
+    required: false
+  lastModifiedDate:
+    type: datetime
+    example: 2016-03-24T14:00:00.000Z
+    required: false
+  lastModifiedById?: string | integer

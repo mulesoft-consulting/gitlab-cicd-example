@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:axa-common-logger="http://www.mulesoft.org/schema/mule/axa-common-logger"
+	xmlns:successfactors="http://www.mulesoft.org/schema/mule/successfactors" xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/successfactors http://www.mulesoft.org/schema/mule/successfactors/current/mule-successfactors.xsd
+http://www.mulesoft.org/schema/mule/axa-common-logger http://www.mulesoft.org/schema/mule/axa-common-logger/current/mule-axa-common-logger.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="get-accounts-api-impl-main" doc:id="366a5c6f-4fe9-4fe4-8cdf-fd7e3b3cdd60" >
+		<set-variable value="${getAccounts.transactionName}" doc:name="transactionName [UPDATE]" doc:id="4bbbdc4a-0b11-4bdd-8989-53b6f90d04dc" doc:description="Update this variable to capture the specific transaction being implemented. For example get-accounts-by-id or post-accounts" variableName="transactionName" />
+		<set-variable value='#[{
+	"accountId": attributes.queryParams.id
+}]' doc:name="businessKeys [UPDATE]" doc:id="441c4767-7001-4139-93e0-82f07888fc26" variableName="businessKeys"/>
+		<flow-ref doc:name="common-set-log-context" doc:id="2cc956ac-ca2c-448c-a8b3-0cbf793be846" name="common-set-log-context" />
+		<logger level="INFO" doc:name="Logger" doc:id="2e0e7c84-699c-417c-82c8-04af3639bafc" message="Started Processing API request"/>
+		<flow-ref doc:name="api-impl-process-and-transform" doc:id="02ab4b9c-c356-40be-8f43-2a145a853467" name="get-accounts-api-impl-process-and-transform" />
+		<logger level="INFO" doc:name="Log END [INFO]" doc:id="0fd5c5b6-a91d-4ed0-9b54-c08b24dc15d3" message="Finished Processing API request" />
+	</flow>
+	<sub-flow name="get-accounts-api-impl-process-and-transform" doc:id="fad6aa62-ecc5-4255-9888-4e4a40b539a9" >
+		<ee:transform doc:name="Transform to Target Model [UPDATE]" doc:id="7a3f7f7d-5ab7-477f-82d2-6583e579d3e6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output json
+---
+{
+	"hello" : "world"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="[REPLACE WITH CALL TO ENDPOINT]" doc:id="9396d999-12fa-4dbf-95e7-7c0e937868aa" />
+		<ee:transform doc:name="Process Response from Endpoint [UPDATE]" doc:id="0e01e246-45c4-4a28-a1ca-e811ec28c45c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output json
+---
+{
+	"hello" : "world"
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

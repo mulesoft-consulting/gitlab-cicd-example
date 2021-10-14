@@ -1,0 +1,10 @@
+#%RAML 1.0 Trait
+
+usage: Apply this trait to each API so that it has a transaction id to trace its flow within the enterprise
+
+headers:
+  x-correlation-id:
+    description: Use the above header to optionally pass a tracking information to this API, for end-to-end traceability of the operation/transaction. If passed, the x-correlation-id will be returned to the consumer in the API response.
+    type: string
+    example: 123e4567-e89b-12d3-a456-426655440000
+    required: false

@@ -1,0 +1,235 @@
+#%RAML 1.0 Trait
+usage: Apply this trait to any API that needs to implement the common error handling
+description: Any error encountered within the API would result in the the following responses being generated.
+
+uses: 
+  commonTypes: errorResponseLibrary.raml
+  
+responses:         
+  400: 
+    description: Bad Request
+    headers:
+      x-correlation-id:
+        description: Specify the transaction identifier received from the request or added by the API otherwise
+        type:        string
+        required:    true
+        example:     359016f0-aef7-44c8-8ebd-015087cca2c0
+    body:
+      application/json:
+        type: commonTypes.errorResponse
+        example:
+          {
+            "error": {
+              "code": "400",
+              "message": "A Bad Request Error has occurred",
+              "description": "Optional Error description",
+              "referenceId": "486471ed-c075-48bd-b90f-0b28e58f61c9",
+              "dateTime": "2021-01-01T12:00:00.000Z"
+            }
+          }
+  401:
+    description: Unauthorized
+    headers:
+      x-correlation-id:
+        description: Specify the transaction identifier received from the request or added by the API otherwise
+        type:        string
+        required:    true
+        example:     359016f0-aef7-44c8-8ebd-015087cca2c0
+    body:
+      application/json:
+        type: commonTypes.errorResponse
+        example:
+          {
+            "error": {
+              "code": "401",
+              "message": "Unauthorized request",
+              "referenceId": "486471ed-c075-48bd-b90f-0b28e58f61c9",
+              "dateTime": "2021-01-01T12:00:00.000Z"
+            }
+          } 
+  403:
+    description: Forbidden
+    headers:
+      x-correlation-id:
+        description: Specify the transaction identifier received from the request or added by the API otherwise
+        type:        string
+        required:    true
+        example:     359016f0-aef7-44c8-8ebd-015087cca2c0
+    body:
+      application/json:
+        type: commonTypes.errorResponse
+        example:
+          {
+            "error": {
+              "code": "403",
+              "message": "Not authorized",
+              "referenceId": "486471ed-c075-48bd-b90f-0b28e58f61c9",
+              "dateTime": "2021-01-01T12:00:00.000Z"
+            }  
+          }               
+  404:
+    description: Not Found
+    headers:
+      x-correlation-id:
+        description: Specify the transaction identifier received from the request or added by the API otherwise
+        type:        string
+        required:    true
+        example:     359016f0-aef7-44c8-8ebd-015087cca2c0
+    body:
+      application/json:
+        type: commonTypes.errorResponse
+        example:
+          {
+            "error": {
+              "code": "404",
+              "message": "Resource not found",
+              "description": "Optional Error description",
+              "referenceId": "486471ed-c075-48bd-b90f-0b28e58f61c9",
+              "dateTime": "2021-01-01T12:00:00.000Z"
+            }
+          }        
+  405:
+    description: Method Not Allowed
+    headers:
+      x-correlation-id:
+        description: Specify the transaction identifier received from the request or added by the API otherwise
+        type:        string
+        required:    true
+        example:     359016f0-aef7-44c8-8ebd-015087cca2c0
+    body:
+      application/json:
+        type: commonTypes.errorResponse
+        example:
+          {
+            "error": {
+              "code": "405",
+              "message": "Method Not Allowed",
+              "description": "Optional Error description",
+              "referenceId": "486471ed-c075-48bd-b90f-0b28e58f61c9",
+              "dateTime": "2021-01-01T12:00:00.000Z"
+            }
+          }
+  406:
+    description: Not Acceptable
+    headers:
+      x-correlation-id:
+        description: Specify the transaction identifier received from the request or added by the API otherwise
+        type:        string
+        required:    true
+        example:     359016f0-aef7-44c8-8ebd-015087cca2c0
+    body:
+      application/json:
+        type: commonTypes.errorResponse
+        example:
+          {
+            "error": {
+              "code": "406",
+              "message": "Not Acceptable",
+              "description": "Optional Error description",
+              "referenceId": "486471ed-c075-48bd-b90f-0b28e58f61c9",
+              "dateTime": "2021-01-01T12:00:00.000Z"
+            }
+          }  
+  412:
+    description: Precondition Failed
+    headers:
+      x-correlation-id:
+        description: Specify the transaction identifier received from the request or added by the API otherwise
+        type:        string
+        required:    true
+        example:     359016f0-aef7-44c8-8ebd-015087cca2c0
+    body:
+      application/json:
+        type: commonTypes.errorResponse
+        example:
+          {
+            "error": {
+              "code": "412",
+              "message": "Precondition Failed",
+              "description": "Optional Error description",
+              "referenceId": "486471ed-c075-48bd-b90f-0b28e58f61c9",
+              "dateTime": "2021-01-01T12:00:00.000Z"
+            }
+          }                      
+  415:
+    description: Unsupported Media Type
+    headers:
+      x-correlation-id:
+        description: Specify the transaction identifier received from the request or added by the API otherwise
+        type:        string
+        required:    true
+        example:     359016f0-aef7-44c8-8ebd-015087cca2c0
+    body:
+      application/json:
+        type: commonTypes.errorResponse
+        example:
+          {
+            "error": {
+              "code": "415",
+              "message": "Unsupported Media Type",
+              "description": "Optional Error description",
+              "referenceId": "486471ed-c075-48bd-b90f-0b28e58f61c9",
+              "dateTime": "2021-01-01T12:00:00.000Z"
+            }
+          }        
+  500:
+    description: Internal Server Error
+    headers:
+      x-correlation-id:
+        description: Specify the transaction identifier received from the request or added by the API otherwise
+        type:        string
+        required:    true
+        example:     359016f0-aef7-44c8-8ebd-015087cca2c0
+    body:
+      application/json:
+        type: commonTypes.errorResponse
+        example:
+          {
+            "error": {
+              "code": "500",
+              "message": "Internal Server Error",
+              "description": "Optional Error description",
+              "referenceId": "486471ed-c075-48bd-b90f-0b28e58f61c9",
+              "dateTime": "2021-01-01T12:00:00.000Z"
+            }
+          }                
+  502:
+    description: Bad Gateway
+    headers:
+      x-correlation-id:
+        description: Specify the transaction identifier received from the request or added by the API otherwise
+        type:        string
+        required:    true
+        example:     359016f0-aef7-44c8-8ebd-015087cca2c0
+    body:
+      application/json:
+        type: commonTypes.errorResponse
+        example:
+          {
+            "error": {
+              "code": "502",
+              "message": "Bad Gateway",
+              "referenceId": "486471ed-c075-48bd-b90f-0b28e58f61c9",
+              "dateTime": "2021-01-01T12:00:00.000Z"
+            }
+          }        
+  504:
+    description: Gateway Time-out
+    headers:
+      x-correlation-id:
+        description: Specify the transaction identifier received from the request or added by the API otherwise
+        type:        string
+        required:    true
+        example:     359016f0-aef7-44c8-8ebd-015087cca2c0
+    body:
+      application/json:
+        type: commonTypes.errorResponse
+        example:
+          {
+            "error": {
+              "code": "504",
+              "message": "Gateway Time-out",
+              "referenceId": "486471ed-c075-48bd-b90f-0b28e58f61c9",
+              "dateTime": "2021-01-01T12:00:00.000Z"
+            }
+          }        

@@ -1,0 +1,9 @@
+#%RAML 1.0 Trait
+
+usage: Apply this to a method that supports returning the number of items in the response 
+responses:
+  200:
+    headers:
+      x-items-count?:
+        type: integer
+        example: 500

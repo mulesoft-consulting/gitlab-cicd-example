@@ -1,0 +1,19 @@
+include:
+  - project: 'mule-gitlab-demo/cicd-base'
+    ref: main
+    file: '.gitlab-ci.yml'
+
+#Default Variables
+variables:
+  # This can be updated as part of manually triggering the pipeline and specifying this variable as part of the manual trigger.
+  DEPLOY_VERSION: $CI_COMMIT_TAG
+
+  # For external facing applications, update this to ext-rdg so that the DLB mapping rules allow this connectivity.
+  APP_NAME_PREFIX: "mule"
+
+  # Default application verion. Update based on versioning strategy and changes that are considered breaking changes.
+  APP_VERSION: "v1"
+
+  #These variables represent the default variables to be used as part of the CI/CD pipeline. In terms of environment specific values (e.g. UAT, PROD needing different numbers / types of workers, please update the Project CI/CD environment variables)
+  CH_WORKER_TYPE: "MICRO"
+  CH_WORKERS: "1"
