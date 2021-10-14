@@ -23,7 +23,7 @@ stages:
   - deploy-snapshot
   - create-release
   - get-release-artifacts
-  - deploy-release
+  - deploy-uat
   - deploy-prod
 
 
@@ -111,8 +111,8 @@ get-release-artifacts:
   only:
     - tags
 
-deploy-release-uat:
-  stage: deploy-release
+deploy-uat:
+  stage: deploy-uat
   script:
     - echo "Deploy to UAT Env"
   variables:
@@ -128,7 +128,7 @@ deploy-release-uat:
     - tags
   script:
     - echo "Deploying the project with maven to $CH_ENV environment"
-    - mvn $MAVEN_CLI_OPTS deploy -DmuleDeploy -DskipTests -Dmule.env=uat $MAVEN_DEPLOY_PROPS -Dcloudhub.skipDeploymentVerification=true -Dmule.deploy.artifact=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dcloudhub.monitoringEnabled=true -Dmaven.install.skip=true
+    - mvn $MAVEN_CLI_OPTS mule:deploy -DmuleDeploy -DskipTests -Dmule.env=uat $MAVEN_DEPLOY_PROPS -Dcloudhub.skipDeploymentVerification=true -Dmule.artifact=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dcloudhub.monitoringEnabled=true -Dmaven.install.skip=true
 
 deploy-prod:
   stage: deploy-prod
@@ -145,7 +145,7 @@ deploy-prod:
     - tags
   script:
     - echo "Deploying the project with maven to $CH_ENV environment"
-    - mvn $MAVEN_CLI_OPTS deploy -DmuleDeploy -DskipTests -Dmule.env=prod $MAVEN_DEPLOY_PROPS -Dmule.deploy.artifact=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dcloudhub.monitoringEnabled=true -Dmaven.install.skip=true
+    - mvn $MAVEN_CLI_OPTS mule:deploy -DmuleDeploy -DskipTests -Dmule.env=prod $MAVEN_DEPLOY_PROPS -Dmule.artifact=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dcloudhub.monitoringEnabled=true -Dmaven.install.skip=true
   artifacts:
     paths:
     - deployArtifacts/*.jar
