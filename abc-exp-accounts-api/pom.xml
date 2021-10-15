@@ -12,7 +12,7 @@
 	<!-- TODO: Replace artifact id with project name -->
 	<artifactId>abc-exp-accounts-api</artifactId>
 	<!-- TODO: Update API version -->
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>mule-application</packaging>
 
 	<!-- TODO: Ensure this matches with project name and description-->
@@ -52,13 +52,28 @@
 	<dependencies>
 		<!-- TODO: Remove this dependency for rest-api-template-->
 	</dependencies>
-	<!-- TODO: Remove this repository and replace with artifact repository where Parent-POM files are published-->
+	<!-- TODO: Update thiswith artifact repository where Parent-POM files are published. Note this might be a group level change, or alternatively a different repository endpoint -->
 	<repositories>
 		<repository>
 			<id>gitlab-maven</id>
 			<url>https://gitlab.com/api/v4/groups/mule-gitlab-demo/-/packages/maven</url>
 		</repository>
 	</repositories>
+
+	<!-- TODO - Remove this section if the HTTP header based authentication works with MuleSoft as this and inherit from the Parent POM  -->
+	<distributionManagement>
+		<repository>
+			<id>gitlab-maven-proxy</id>
+			<!-- Replace the below URL with the relevant endpoint for the organization proxy -->
+			<url>http://nds-gitlab-proxy.us-w2.cloudhub.io/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</distributionManagement>
 
 	<scm>
 		<developerConnection>scm:git:git@gitlab.com:${env.CI_PROJECT_PATH}.git</developerConnection>

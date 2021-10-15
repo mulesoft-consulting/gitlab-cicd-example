@@ -8,6 +8,9 @@ variables:
   # This can be updated as part of manually triggering the pipeline and specifying this variable as part of the manual trigger.
   DEPLOY_VERSION: $CI_COMMIT_TAG
 
+  # Update this based on the Group Id related to the Project. This should be done as a one-off during project initialisation. Note that this is used by the base CICD pipeline to retrieve and deploy artifacts.
+  GROUP_ID: "com.example"
+
   # For external facing applications, update this to ext-rdg so that the DLB mapping rules allow this connectivity.
   APP_NAME_PREFIX: "mule"
 

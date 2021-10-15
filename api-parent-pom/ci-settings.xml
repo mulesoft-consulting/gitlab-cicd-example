@@ -17,26 +17,19 @@
 			<id>anypoint-exchange</id>
 			<!-- NOTE: In order to be able to publish assets to exchange, this user
 				will need Exchange Contributor Role -->
-			<username>${env.ANYPOINT_USER}</username>
-			<password>${env.ANYPOINT_PASSWORD}</password>
+			<username>~~~Client~~~</username>
+			<password>${env.ANYPOINT_CLIENT_CREDENTIALS}</password>
 		</server>
 		<server>
 	     <id>gitlab-maven</id>
 	     <configuration>
 	        <httpHeaders>
 	          <property>
-	            <name>Private-Token</name>
-	            <value>${env.GITLAB_PRIVATE_TOKEN}</value>
+	            <name>Job-Token</name>
+	            <value>${env.CI_JOB_TOKEN}</value>
 	          </property>
 	        </httpHeaders>
 	      </configuration>
 	  </server>
-
-	  <server>
-	     <id>gitlab-maven-proxy</id>
-	     <username>${env.GITLAB_PROXY_CLIENT_ID}</username>
-	     <password>${env.GITLAB_PROXY_CLIENT_SECRET}</password>
-	  </server>
 	</servers>
-
 </settings>

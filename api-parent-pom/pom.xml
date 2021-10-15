@@ -1,28 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>uk.co.company</groupId>
+  <groupId>com.example</groupId>
   <artifactId>api-parent-pom</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
   <name>api-parent-pom</name>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <app.runtime>4.3.0</app.runtime>
-    <mule.maven.plugin.version>3.4.0</mule.maven.plugin.version>
+    <mule.version>${MULE_VERSION}</mule.version>
+    <mule.maven.plugin.version>3.5.3</mule.maven.plugin.version>
     <maven.release.plugin.version>3.0.0-M1</maven.release.plugin.version>
     <!-- Dependency Versions -->
-    <mule.tools.version>1.2</mule.tools.version>
-    <munit.version>2.2.4</munit.version>
-    <mule.http.connector.version>1.5.17</mule.http.connector.version>
-    <mule.sockets.connector.version>1.1.6</mule.sockets.connector.version>
-    <mule.apikit.module.version>1.3.10</mule.apikit.module.version>
-    <mule.secure.property.configuration.version>1.2.1</mule.secure.property.configuration.version>
-    <mule.validation.module.version>1.4.0</mule.validation.module.version>
-    <munit.runner.version>2.2.4</munit.runner.version>
-    <json.logger.version>1.0.2</json.logger.version>
-    <common.error.handler.version>2.0.0</common.error.handler.version>
+    <munit.version>2.3.1</munit.version>
+    <mule.http.connector.version>1.5.25</mule.http.connector.version>
+    <mule.sockets.connector.version>1.2.1</mule.sockets.connector.version>
+    <mule.apikit.module.version>1.5.2</mule.apikit.module.version>
+    <mule.secure.property.configuration.version>1.2.3</mule.secure.property.configuration.version>
+    <munit.runner.version>2.3.1</munit.runner.version>
     <!-- ANYPOINT -->
     <connectedApp.clientId>${CONNECTED_APP_CLIENT_ID}</connectedApp.clientId>
     <connectedApp.clientSecret>${CONNECTED_APP_CLIENT_SECRET}</connectedApp.clientSecret>
@@ -37,9 +34,9 @@
     <cloudhub.workers>${CH_WORKERS}</cloudhub.workers>
     <cloudhub.clientId>${CH_CLIENT_ID}</cloudhub.clientId>
     <cloudhub.clientSecret>${CH_CLIENT_SECRET}</cloudhub.clientSecret>
-    <cloudhub.monitoringEnabled>false</cloudhub.monitoringEnabled>
-    <cloudhub.skipDeploymentVerification>false</cloudhub.skipDeploymentVerification>
-    <build.name>${BUILD_NAME}</build.name>
+    <cloudhub.applicationName>${CH_APPLICATION_NAME}</cloudhub.applicationName>
+    <cloudhub.monitoringEnabled>${CH_MONITORING_ENABLED}</cloudhub.monitoringEnabled>
+    <cloudhub.skipDeploymentVerification>${CH_SKIP_DEPLOYMENT_VERIFICATION}</cloudhub.skipDeploymentVerification>
     <!-- Default None - This should be overriden at the application level -->
     <api.layer>None</api.layer>
     <!-- API Layer Descriptions -->
@@ -76,24 +73,6 @@
       <classifier>mule-plugin</classifier>
     </dependency>
     <dependency>
-      <groupId>org.mule.modules</groupId>
-      <artifactId>mule-validation-module</artifactId>
-      <version>${mule.validation.module.version}</version>
-      <classifier>mule-plugin</classifier>
-    </dependency>
-    <dependency>
-      <groupId>${cloudhub.masterBusinessGroupId}</groupId>
-      <artifactId>json-logger</artifactId>
-      <version>${json.logger.version}</version>
-      <classifier>mule-plugin</classifier>
-    </dependency>
-    <dependency>
-      <groupId>${cloudhub.rdgOrgGroupId}</groupId>
-      <artifactId>common-error-handler</artifactId>
-      <version>${common.error.handler.version}</version>
-      <classifier>mule-plugin</classifier>
-    </dependency>
-    <dependency>
       <groupId>com.mulesoft.munit</groupId>
       <artifactId>munit-runner</artifactId>
       <version>${munit.runner.version}</version>
@@ -108,103 +87,61 @@
       <classifier>mule-plugin</classifier>
     </dependency>
   </dependencies>
-  <profiles>
-    <profile>
-      <id>exchange-repository</id>
-      <activation>
-        <property>
-          <name>deployToExchange</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <distributionManagement>
-        <repository>
-          <id>anypoint-exchange</id>
-          <name>Mule Repo</name>
-          <url>https://maven.anypoint.mulesoft.com/api/v1/organizations/${project.groupId}/maven</url>
-          <layout>default</layout>
-        </repository>
-      </distributionManagement>
-    </profile>
-    <profile>
-      <id>cloudhub</id>
-      <build>
-        <resources>
-          <resource>
-            <directory>${basedir}/src/main/app</directory>
-            <filtering>true</filtering>
-          </resource>
-          <resource>
-            <directory>${basedir}/src/main/resources</directory>
-            <filtering>true</filtering>
-          </resource>
-        </resources>
-        <plugins>
-          <plugin>
-            <groupId>org.mule.tools.maven</groupId>
-            <artifactId>mule-maven-plugin</artifactId>
-            <version>${mule.maven.plugin.version}</version>
-            <extensions>true</extensions>
-            <configuration>
-              <filterAppDirectory>true</filterAppDirectory>
-              <classifier>mule-application</classifier>
-              <cloudHubDeployment>
-                <uri>${anypoint.uri}</uri>
-                <muleVersion>${app.runtime}</muleVersion>
-                <connectedAppClientId>${connectedApp.clientId}</connectedAppClientId>
-                <connectedAppClientSecret>${connectedApp.clientSecret}</connectedAppClientSecret>
-                <connectedAppGrantType>client_credentials</connectedAppGrantType>
-                <applicationName>${build.name}</applicationName>
-                <environment>${cloudhub.environment}</environment>
-                <businessGroup>${cloudhub.businessGroup}</businessGroup>
-                <businessGroupId>${cloudhub.businessGroupId}</businessGroupId>
-                <region>${cloudhub.region}</region>
-                <workers>${cloudhub.workers}</workers>
-                <workerType>${cloudhub.workerType}</workerType>
-                <artifact>${mule.deploy.artifact}</artifact>
-                <skipDeploymentVerification>${cloudhub.skipDeploymentVerification}</skipDeploymentVerification>
-                <properties>
-                  <mule.key>${mule.key}</mule.key>
-                  <mule.env>${mule.env}</mule.env>
-                  <api.id>${api.id}</api.id>
-                  <anypoint.platform.client_id>${cloudhub.clientId}</anypoint.platform.client_id>
-                  <anypoint.platform.client_secret>${cloudhub.clientSecret}</anypoint.platform.client_secret>
-                  <anypoint.platform.config.analytics.agent.enabled>${cloudhub.monitoringEnabled}</anypoint.platform.config.analytics.agent.enabled>
-                  <anypoint.platform.visualizer.layer>${api.layer}</anypoint.platform.visualizer.layer>
-                </properties>
-              </cloudHubDeployment>
-            </configuration>
-            <executions>
-              <execution>
-                <id>deploy</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>deploy</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>3.7.0</version>
-            <configuration>
-              <compilerArgs>
-                <args>-parameters</args>
-              </compilerArgs>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+
   <build>
+  <pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.mule.tools.maven</groupId>
         <artifactId>mule-maven-plugin</artifactId>
         <version>${mule.maven.plugin.version}</version>
         <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>default-install</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>deploy</id>
+            <goals>
+              <goal>deploy</goal>
+            </goals>
+            <configuration>
+              <classifier>mule-application</classifier>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <cloudHubDeployment>
+            <!-- muleVersion is the runtime version as it appears on the CloudHub interface -->
+            <muleVersion>${mule.version}</muleVersion>
+            <region>${cloudhub.region}</region>
+            <workers>${cloudhub.workers}</workers>
+            <workerType>${cloudhub.workerType}</workerType>
+            <connectedAppClientId>${connectedApp.clientId}</connectedAppClientId>
+            <connectedAppClientSecret>${connectedApp.clientSecret}</connectedAppClientSecret>
+            <connectedAppGrantType>client_credentials</connectedAppGrantType>
+            <applicationName>${cloudhub.applicationName}</applicationName>
+            <environment>${cloudhub.environment}</environment>
+            <objectStoreV2>true</objectStoreV2>
+            <persistentQueues>${anypoint.cloudhub.persistentQueues}</persistentQueues>
+            <deploymentTimeout>1200000</deploymentTimeout>
+            <businessGroup>${cloudhub.businessGroup}</businessGroup>
+            <skipDeploymentVerification>${cloudhub.skipDeploymentVerification}</skipDeploymentVerification>
+            <properties>
+              <!-- <mule.env> determines the properties file to load -->
+              <env>${mule.env}</env>
+              <encrypt.key>${encrypt.key}</encrypt.key>
+              <api.id>${api.id}</api.id>
+              <anypoint.platform.base_uri>https://anypoint.mulesoft.com/</anypoint.platform.base_uri>
+              <anypoint.platform.analytics_base_uri>https://analytics-ingest.anypoint.mulesoft.com/</anypoint.platform.analytics_base_uri>
+              <anypoint.platform.client_secret>${cloudhub.clientSecret}</anypoint.platform.client_secret>
+              <anypoint.platform.client_id>${cloudhub.clientId}</anypoint.platform.client_id>
+              <anypoint.platform.config.analytics.agent.enabled>${cloudhub.monitoringEnabled}</anypoint.platform.config.analytics.agent.enabled>
+              <anypoint.platform.visualizer.layer>${api.layer}</anypoint.platform.visualizer.layer>
+            </properties>
+          </cloudHubDeployment>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>com.mulesoft.munit.tools</groupId>
@@ -235,9 +172,7 @@
               <ignoreFlow>api-console</ignoreFlow>
             </ignoreFlows>
             <ignoreFiles>
-              <ignoreFile>error-handling.xml</ignoreFile>
               <ignoreFile>health.xml</ignoreFile>
-              <ignoreFile>module-error-handler-plugin.xml</ignoreFile>
             </ignoreFiles>
           </coverage>
         </configuration>
@@ -251,22 +186,25 @@
         </configuration>
       </plugin>
     </plugins>
+  </pluginManagement>
   </build>
+
   <distributionManagement>
     <repository>
-      <id>gitlab-maven-proxy</id>
-      <url>https://dev.api.company.co.uk/gitlab-api-proxy/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
+      <id>gitlab-maven</id>
+      <url>${env.CI_API_V4_URL}/projects/${env.CI_PROJECT_ID}/packages/maven</url>
     </repository>
     <snapshotRepository>
-      <id>gitlab-maven-proxy</id>
-      <url>https://dev.api.company.co.uk/gitlab-api-proxy/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
+      <id>gitlab-maven</id>
+      <url>${env.CI_API_V4_URL}/projects/${env.CI_PROJECT_ID}/packages/maven</url>
     </snapshotRepository>
   </distributionManagement>
+
   <repositories>
     <repository>
       <id>anypoint-exchange</id>
       <name>Anypoint Exchange</name>
-      <url>https://maven.anypoint.mulesoft.com/api/v2/maven</url>
+      <url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
       <layout>default</layout>
     </repository>
     <repository>
@@ -311,10 +249,31 @@
       <id>anypoint-exchange</id>
       <name>Anypoint Exchange</name>
       <layout>default</layout>
-      <url>https://maven.anypoint.mulesoft.com/api/v2/maven</url>
+      <url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
+
+  <profiles>
+    <profile>
+      <id>exchange-repository</id>
+      <activation>
+        <property>
+          <name>deployToExchange</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <distributionManagement>
+        <repository>
+          <id>anypoint-exchange</id>
+          <name>Anypoint Echange Repository</name>
+          <url>https://maven.anypoint.mulesoft.com/api/v3/organizations/${project.groupId}/maven</url>
+          <layout>default</layout>
+        </repository>
+      </distributionManagement>
+    </profile>
+  </profiles>
+
 </project>

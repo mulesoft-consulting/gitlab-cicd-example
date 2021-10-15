@@ -6,7 +6,7 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   MAVEN_DEPLOY_PROPS: "-Dapi.id=$API_ID -Dencrypt.key=$MULE_KEY -DMULE_VERSION=$MULE_VERSION -DCH_ENV=$CH_ENV -DCONNECTED_APP_CLIENT_ID=$CONNECTED_APP_CLIENT_ID -DCONNECTED_APP_CLIENT_SECRET=$CONNECTED_APP_CLIENT_SECRET -DCH_RGN=$CH_RGN -DCH_WORKERTYPE=$CH_WORKER_TYPE -DCH_WORKERS=$CH_WORKERS -DCH_CLIENT_ID=$CH_CLIENT_ID -DCH_CLIENT_SECRET=$CH_CLIENT_SECRET -DCH_APPLICATION_NAME=$CH_APPLICATION_NAME -DCH_BG_NAME=$CH_BG_NAME"
 
-  # Cloudhub environment identifiers.
+  # Cloudhub environment identifiers. This needs to match environment names in Cloudhub.
   CH_ENV_DEV: "DEV"
   CH_ENV_TEST: "TEST"
   CH_ENV_UAT: "UAT"
@@ -23,7 +23,7 @@ stages:
   - deploy-snapshot
   - create-release
   - get-release-artifacts
-  - deploy-release
+  - deploy-uat
   - deploy-prod
 
 
@@ -107,12 +107,12 @@ get-release-artifacts:
   script:
     - echo "Retrieving Release Artifacts from GitLab package repository"
     - mkdir -p deployArtifacts
-    - mvn $MAVEN_CLI_OPTS dependency:get -Dartifact=com.example:${CI_PROJECT_NAME}:${DEPLOY_VERSION}:jar:mule-application -DremoteRepositories=gitlab-maven::default::https://gitlab.com/api/v4/groups/mule-gitlab-demo/-/packages/maven -Ddest=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dtransitive=false
+    - mvn $MAVEN_CLI_OPTS dependency:get -Dartifact=${GROUP_ID}:${CI_PROJECT_NAME}:${DEPLOY_VERSION}:jar:mule-application -DremoteRepositories=gitlab-maven::default::${CI_API_V4_URL}/groups/${CI_PROJECT_ROOT_NAMESPACE}/-/packages/maven -Ddest=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dtransitive=false
   only:
     - tags
 
-deploy-release-uat:
-  stage: deploy-release
+deploy-uat:
+  stage: deploy-uat
   script:
     - echo "Deploy to UAT Env"
   variables:
@@ -128,7 +128,7 @@ deploy-release-uat:
     - tags
   script:
     - echo "Deploying the project with maven to $CH_ENV environment"
-    - mvn $MAVEN_CLI_OPTS deploy -DmuleDeploy -DskipTests -Dmule.env=uat $MAVEN_DEPLOY_PROPS -Dcloudhub.skipDeploymentVerification=true -Dmule.deploy.artifact=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dcloudhub.monitoringEnabled=true -Dmaven.install.skip=true
+    - mvn $MAVEN_CLI_OPTS mule:deploy -DmuleDeploy -DskipTests -Dmule.env=uat $MAVEN_DEPLOY_PROPS -Dcloudhub.skipDeploymentVerification=true -Dmule.artifact=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dcloudhub.monitoringEnabled=true -Dmaven.install.skip=true
 
 deploy-prod:
   stage: deploy-prod
@@ -145,7 +145,7 @@ deploy-prod:
     - tags
   script:
     - echo "Deploying the project with maven to $CH_ENV environment"
-    - mvn $MAVEN_CLI_OPTS deploy -DmuleDeploy -DskipTests -Dmule.env=prod $MAVEN_DEPLOY_PROPS -Dmule.deploy.artifact=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dcloudhub.monitoringEnabled=true -Dmaven.install.skip=true
+    - mvn $MAVEN_CLI_OPTS mule:deploy -DmuleDeploy -DskipTests -Dmule.env=prod $MAVEN_DEPLOY_PROPS -Dmule.artifact=deployArtifacts/${CI_PROJECT_NAME}-${DEPLOY_VERSION}-mule-application.jar -Dcloudhub.monitoringEnabled=true -Dmaven.install.skip=true
   artifacts:
     paths:
     - deployArtifacts/*.jar
