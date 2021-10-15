@@ -21,7 +21,7 @@ cache:
 stages:
   - build
   - deploy-snapshot
-  - create-release
+  - -release
   - get-release-artifacts
   - deploy-uat
   - deploy-prod
@@ -80,7 +80,6 @@ deploy-snapshot-test:
 
 release:
   stage: create-release
-  when: manual
   only:
       - main
   before_script:
