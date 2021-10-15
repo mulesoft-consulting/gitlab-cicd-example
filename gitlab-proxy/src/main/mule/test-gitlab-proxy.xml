@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ed6a0f3c-c047-444f-8a1d-0b450d0846ef" >
+		<http:listener-connection host="0.0.0.0" port="${api.port}" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="d23473b9-2009-4c4a-bcce-43aa57de4695" responseTimeout="${gitlab.timeout}">
+		<http:request-connection protocol="HTTPS" host="${gitlab.host}" connectionIdleTimeout="${gitlab.timeout}"/>
+	</http:request-config>
+	<api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="dc214723-979f-40ea-99dc-71f1e510c10c" flowRef="test-gitlab-proxyFlow" />
+	<configuration-properties doc:name="Configuration properties" doc:id="0ef67bc0-d7e2-4a48-99d1-3aa5311cf3fe" file="config.yaml" />
+	<flow name="test-gitlab-proxyFlow" doc:id="d6f6a9ed-493b-4040-9d80-c0f7f43cd867" >
+		<http:listener doc:name="Listener" doc:id="bfa578a3-b527-490d-a95d-bbe47c126582" config-ref="HTTP_Listener_config" path="/api/*"/>
+		<logger level="INFO" doc:name="Logger" doc:id="1a509c14-92ba-4e6d-8a83-90e1d17e5b79" />
+		<http:request method="#[attributes.method]" doc:name="Gitlab" doc:id="de0371d1-6602-49c9-9f12-4d3c39f14afc" config-ref="HTTP_Request_configuration" path="#[attributes.relativePath]">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Private-Token" : Mule::p('gitlab.privateToken')
+}]]]></http:headers>
+		</http:request>
+	</flow>
+</mule>

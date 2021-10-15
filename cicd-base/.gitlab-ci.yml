@@ -99,7 +99,7 @@ release:
     - git checkout -B "$CI_COMMIT_REF_NAME"
     - mvn $MAVEN_CLI_OPTS release:prepare release:perform release:clean -DlocalCheckout=true -DscmCommentPrefix="Auto-Release [skip ci]" -Darguments="-Dmule.skip.deploy=true -Dmaven.test.skip=true -DskipTests"
     # We are unable to auto create the branch using GIT here due to issues with permissions on the CI deploy keys so have opted for the API route.
-    #- curl --request POST --header "Private-Token:${GITLAB_PRIVATE_TOKEN}" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/branches -d branch=release-$RELEASE_VERSION -d ref=rc$RELEASE_VERSION
+    #- curl --request POST --header "Private-Token:${GITLAB_PRIVATE_TOKEN}" https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/branches -d branch=release-$RELEASE_VERSION -d ref=$RELEASE_VERSION
 
 get-release-artifacts:
   stage: get-release-artifacts

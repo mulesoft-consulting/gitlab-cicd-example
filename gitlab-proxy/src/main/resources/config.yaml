@@ -1,0 +1,8 @@
+api:
+  id: "12345678"
+  port: "8081"
+  
+gitlab:
+  host: "gitlab.com"
+  timeout: "120000"
+  privateToken: "NHzAp7AR2WAAXSLFiHwE"
